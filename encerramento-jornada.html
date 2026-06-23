@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Total Clean — Encerramento de Jornada</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #185FA5;
+    --blue-dark: #0C447C;
+    --blue-light: #E6F1FB;
+    --blue-border: #85B7EB;
+    --green: #1D9E75;
+    --green-dark: #0F6E56;
+    --green-light: #E1F5EE;
+    --green-border: #5DCAA5;
+    --red: #E24B4A;
+    --red-light: #FCEBEB;
+    --red-dark: #A32D2D;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --amber-dark: #633806;
+    --gray-50: #F8F8F6;
+    --gray-100: #F1EFE8;
+    --gray-200: #D3D1C7;
+    --gray-600: #5F5E5A;
+    --gray-900: #2C2C2A;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
+  .header {
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-dot { width: 10px; height: 10px; background: var(--blue); border-radius: 50%; }
+  .header-title { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+  .header-sub { font-size: 12px; color: var(--gray-600); margin-top: 1px; }
+  .progress-bar { height: 3px; background: var(--gray-100); position: sticky; top: 61px; z-index: 9; }
+  .progress-fill { height: 100%; background: var(--blue); transition: width 0.3s ease; width: 0%; }
+  .container { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
+  .date-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--blue-light); color: var(--blue-dark);
+    font-size: 12px; font-weight: 500; padding: 5px 10px;
+    border-radius: 999px; margin-bottom: 20px;
+  }
+  .card { background: white; border-radius: var(--radius); border: 1px solid var(--gray-200); padding: 20px; margin-bottom: 12px; }
+  .card-title {
+    font-size: 11px; font-weight: 600; color: var(--gray-600);
+    text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .card-title::after { content: ''; flex: 1; height: 1px; background: var(--gray-100); }
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-600); margin-bottom: 6px; }
+  .field label .req { color: var(--red); margin-left: 2px; }
+  input[type=text], input[type=number], select, textarea {
+    width: 100%; border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
+    padding: 0 12px; font-size: 15px; color: var(--gray-900); background: white;
+    appearance: none; -webkit-appearance: none; outline: none; transition: border-color 0.15s;
+    font-family: inherit;
+  }
+  input[type=text], input[type=number], select { height: 44px; }
+  textarea { padding: 12px; min-height: 80px; resize: vertical; line-height: 1.5; }
+  input:focus, select:focus, textarea:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(24,95,165,0.1); }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235F5E5A' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .photo-btn {
+    width: 100%; height: 80px; border: 1.5px dashed var(--gray-200);
+    border-radius: var(--radius-sm); background: var(--gray-50);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 5px; cursor: pointer; position: relative; transition: border-color 0.15s, background 0.15s; overflow: hidden;
+  }
+  .photo-btn:hover { border-color: var(--blue); }
+  .photo-btn input[type=file] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+  .photo-btn svg { width: 22px; height: 22px; stroke: var(--gray-600); }
+  .photo-btn span { font-size: 12px; color: var(--gray-600); font-weight: 500; }
+  .photo-btn small { font-size: 11px; color: var(--gray-200); }
+  .photo-btn.done { border-color: var(--green); background: var(--green-light); border-style: solid; }
+  .photo-btn.done svg { stroke: var(--green-dark); }
+  .photo-btn.done span { color: var(--green-dark); }
+  .photo-btn.error { border-color: var(--red); background: var(--red-light); }
+  .photo-btn.error span { color: var(--red-dark); }
+  .fuel-section { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--gray-100); }
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; background: var(--gray-50); border-radius: var(--radius-sm);
+    border: 1px solid var(--gray-200); cursor: pointer;
+  }
+  .toggle-row span { font-size: 14px; font-weight: 500; }
+  .toggle-switch {
+    width: 44px; height: 24px; background: var(--gray-200); border-radius: 999px;
+    position: relative; transition: background 0.2s; flex-shrink: 0;
+  }
+  .toggle-switch::after {
+    content: ''; position: absolute; top: 2px; left: 2px;
+    width: 20px; height: 20px; background: white; border-radius: 50%;
+    transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .toggle-switch.on { background: var(--green); }
+  .toggle-switch.on::after { transform: translateX(20px); }
+  .submit-btn {
+    width: 100%; height: 52px; background: var(--blue); color: white; border: none;
+    border-radius: var(--radius); font-size: 16px; font-weight: 600; cursor: pointer;
+    margin-top: 8px; transition: background 0.15s, transform 0.1s;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .submit-btn:hover { background: var(--blue-dark); }
+  .submit-btn:active { transform: scale(0.98); }
+  .success-screen { display: none; text-align: center; padding: 40px 20px; }
+  .success-icon { width: 72px; height: 72px; background: var(--blue-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 32px; }
+  .success-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--blue-dark); }
+  .success-sub { font-size: 14px; color: var(--gray-600); line-height: 1.6; }
+  .km-summary {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px;
+  }
+  .km-box {
+    background: var(--blue-light); border-radius: var(--radius-sm); padding: 12px;
+    text-align: center;
+  }
+  .km-box .val { font-size: 20px; font-weight: 700; color: var(--blue-dark); }
+  .km-box .lbl { font-size: 11px; color: var(--blue); margin-top: 2px; }
+  .divider { border: none; border-top: 1px solid var(--gray-100); margin: 14px 0; }
+  .info-box { background: var(--amber-light); border: 1px solid var(--amber); border-radius: var(--radius-sm); padding: 10px 14px; font-size: 12px; color: var(--amber-dark); margin-top: 10px; line-height: 1.5; }
+  .field-hint { font-size: 11px; color: var(--gray-600); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-dot"></div>
+  <div>
+    <div class="header-title">Total Clean</div>
+    <div class="header-sub">Encerramento de jornada</div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="container">
+  <div id="form-content">
+    <div class="date-badge">🌙 <span id="date-label"></span></div>
+
+    <!-- Identificação -->
+    <div class="card">
+      <div class="card-title">Identificação</div>
+      <div class="field">
+        <label>Motorista <span class="req">*</span></label>
+        <select id="motorista" onchange="updateProgress()">
+          <option value="">Selecionar...</option>
+          <option>Eduardo</option>
+          <option>Gustavo</option>
+          <option>Márcio</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Veículo <span class="req">*</span></label>
+        <select id="placa" onchange="updateProgress()">
+          <option value="">Selecionar...</option>
+          <option>PRISMA · MSR1361</option>
+          <option>CG 160 CARGO · TUG1B68</option>
+          <option>CG 160 CARGO · TUT1J12</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- KM final -->
+    <div class="card">
+      <div class="card-title">Quilometragem final</div>
+      <div class="field">
+        <label>KM atual <span class="req">*</span></label>
+        <input type="number" id="km-fim" placeholder="00000" oninput="updateProgress()">
+        <p class="field-hint">Informe o KM que aparece no hodômetro agora.</p>
+      </div>
+      <div class="field">
+        <label>Foto do hodômetro <span class="req">*</span></label>
+        <div class="photo-btn" id="pb-km" onclick="triggerFile('f-km')">
+          <input type="file" id="f-km" accept="image/*" capture="environment" onchange="markPhoto('pb-km', this, 'Hodômetro registrado')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Tirar foto</span>
+          <small>Hodômetro da moto</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Abastecimento -->
+    <div class="card">
+      <div class="card-title">Abastecimento</div>
+      <div class="toggle-row" onclick="toggleFuel()">
+        <span>Abasteceu hoje?</span>
+        <div class="toggle-switch" id="fuel-toggle"></div>
+      </div>
+
+      <div class="fuel-section" id="fuel-section">
+        <div class="row3">
+          <div class="field">
+            <label>KM no abast. <span class="req">*</span></label>
+            <input type="number" id="km-fuel" placeholder="00000" oninput="updateProgress()">
+          </div>
+          <div class="field">
+            <label>Litros <span class="req">*</span></label>
+            <input type="number" id="litros" placeholder="0.0" step="0.1" oninput="updateProgress()">
+          </div>
+          <div class="field">
+            <label>Valor (R$) <span class="req">*</span></label>
+            <input type="number" id="valor-fuel" placeholder="0,00" step="0.01" oninput="updateProgress()">
+          </div>
+        </div>
+        <div class="field">
+          <label>Posto</label>
+          <input type="text" id="posto" placeholder="Nome do posto">
+        </div>
+        <div class="field">
+          <label>Foto do comprovante <span class="req">*</span></label>
+          <div class="photo-btn" id="pb-fuel" onclick="triggerFile('f-fuel')">
+            <input type="file" id="f-fuel" accept="image/*" capture="environment" onchange="markPhoto('pb-fuel', this, 'Comprovante ok')">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Tirar foto</span>
+            <small>Nota ou display do posto</small>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ocorrências -->
+    <div class="card">
+      <div class="card-title">Ocorrências do dia</div>
+      <div class="field" style="margin-bottom:0">
+        <label>Observações</label>
+        <textarea id="obs" placeholder="Descreva qualquer problema, acidente, dano, atraso ou evento relevante do dia..."></textarea>
+        <p class="field-hint">Deixe em branco se o dia correu sem nenhum problema.</p>
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="submitForm()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Encerrar jornada
+    </button>
+  </div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">🌙</div>
+    <div class="success-title">Jornada encerrada!</div>
+    <div class="success-sub" id="success-detail"></div>
+    <div class="km-summary" id="km-summary" style="margin-top:20px"></div>
+    <div style="margin-top:20px;padding:14px;background:var(--green-light);border-radius:var(--radius);font-size:13px;color:var(--green-dark);line-height:1.6;">
+      ✅ Bom trabalho! Até amanhã.
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('date-label').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+
+let fuelOn = false;
+
+function triggerFile(id) { document.getElementById(id).click(); }
+
+function markPhoto(areaId, input, label) {
+  const area = document.getElementById(areaId);
+  if (input.files && input.files[0]) {
+    area.classList.add('done');
+    area.classList.remove('error');
+    area.querySelector('span').textContent = label || 'Foto ok';
+    if (area.querySelector('small')) area.querySelector('small').textContent = '';
+    area.querySelector('svg').innerHTML = '<polyline points="20 6 9 17 4 12" stroke-width="2"/>';
+  }
+  updateProgress();
+}
+
+function toggleFuel() {
+  fuelOn = !fuelOn;
+  const toggle = document.getElementById('fuel-toggle');
+  const section = document.getElementById('fuel-section');
+  toggle.classList.toggle('on', fuelOn);
+  section.style.display = fuelOn ? 'block' : 'none';
+  updateProgress();
+}
+
+function updateProgress() {
+  let filled = 0, total = 5;
+  if (document.getElementById('motorista').value) filled++;
+  if (document.getElementById('placa').value) filled++;
+  if (document.getElementById('km-fim').value) filled++;
+  if (document.getElementById('pb-km').classList.contains('done')) filled++;
+  if (!fuelOn || (document.getElementById('litros').value && document.getElementById('valor-fuel').value && document.getElementById('pb-fuel').classList.contains('done'))) filled++;
+  document.getElementById('progress').style.width = Math.round((filled / total) * 100) + '%';
+}
+
+function submitForm() {
+  const mot = document.getElementById('motorista').value;
+  const placa = document.getElementById('placa').value;
+  const kmFim = document.getElementById('km-fim').value;
+
+  if (!mot) { alert('Selecione o motorista.'); return; }
+  if (!placa) { alert('Informe a placa do veículo.'); return; }
+  if (!kmFim) { alert('Informe o KM final.'); return; }
+
+  const required = [{ id: 'pb-km', label: 'hodômetro final' }];
+  if (fuelOn) {
+    if (!document.getElementById('km-fuel').value) { alert('Informe o KM no momento do abastecimento.'); return; }
+    if (!document.getElementById('litros').value) { alert('Informe os litros abastecidos.'); return; }
+    if (!document.getElementById('valor-fuel').value) { alert('Informe o valor do abastecimento.'); return; }
+    required.push({ id: 'pb-fuel', label: 'comprovante de abastecimento' });
+  }
+
+  const missing = required.filter(p => !document.getElementById(p.id).classList.contains('done'));
+  if (missing.length) {
+    missing.forEach(p => document.getElementById(p.id).classList.add('error'));
+    alert('Fotos obrigatórias faltando:\n• ' + missing.map(p => p.label).join('\n• '));
+    return;
+  }
+
+  document.getElementById('form-content').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+  document.getElementById('progress').style.width = '100%';
+
+  const km = parseInt(kmFim);
+  document.getElementById('success-detail').innerHTML = `<strong>${mot}</strong> · Placa ${placa} · KM final ${km.toLocaleString('pt-BR')}`;
+
+  let summaryHTML = `<div class="km-box"><div class="val">${km.toLocaleString('pt-BR')}</div><div class="lbl">KM final</div></div>`;
+  if (fuelOn) {
+    const litros = parseFloat(document.getElementById('litros').value).toFixed(1);
+    const valor = parseFloat(document.getElementById('valor-fuel').value).toFixed(2).replace('.',',');
+    summaryHTML += `<div class="km-box"><div class="val">${litros}L</div><div class="lbl">R$ ${valor} no posto</div></div>`;
+  }
+  document.getElementById('km-summary').innerHTML = summaryHTML;
+}
+</script>
+</body>
+</html>

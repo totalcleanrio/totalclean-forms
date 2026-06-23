@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Total Clean — Início de Jornada</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #1D9E75;
+    --green-dark: #0F6E56;
+    --green-light: #E1F5EE;
+    --green-border: #5DCAA5;
+    --red: #E24B4A;
+    --red-light: #FCEBEB;
+    --red-dark: #A32D2D;
+    --amber: #EF9F27;
+    --amber-light: #FAEEDA;
+    --amber-dark: #633806;
+    --gray-50: #F8F8F6;
+    --gray-100: #F1EFE8;
+    --gray-200: #D3D1C7;
+    --gray-600: #5F5E5A;
+    --gray-900: #2C2C2A;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
+  .header {
+    background: white;
+    border-bottom: 1px solid var(--gray-200);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-dot {
+    width: 10px; height: 10px;
+    background: var(--green);
+    border-radius: 50%;
+  }
+  .header-title { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+  .header-sub { font-size: 12px; color: var(--gray-600); margin-top: 1px; }
+  .progress-bar {
+    height: 3px;
+    background: var(--gray-100);
+    position: sticky;
+    top: 61px;
+    z-index: 9;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--green);
+    transition: width 0.3s ease;
+    width: 0%;
+  }
+  .container { max-width: 480px; margin: 0 auto; padding: 20px 16px; }
+  .date-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--green-light);
+    color: var(--green-dark);
+    font-size: 12px;
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: white;
+    border-radius: var(--radius);
+    border: 1px solid var(--gray-200);
+    padding: 20px;
+    margin-bottom: 12px;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--gray-100);
+  }
+  .field { margin-bottom: 14px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gray-600);
+    margin-bottom: 6px;
+  }
+  .field label .req { color: var(--red); margin-left: 2px; }
+  input[type=text], input[type=number], select {
+    width: 100%;
+    height: 44px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    padding: 0 12px;
+    font-size: 15px;
+    color: var(--gray-900);
+    background: white;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,0.1); }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235F5E5A' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 36px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .photo-btn {
+    width: 100%;
+    height: 80px;
+    border: 1.5px dashed var(--gray-200);
+    border-radius: var(--radius-sm);
+    background: var(--gray-50);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.15s, background 0.15s;
+    overflow: hidden;
+  }
+  .photo-btn:hover { border-color: var(--green); }
+  .photo-btn input[type=file] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+  .photo-btn svg { width: 22px; height: 22px; stroke: var(--gray-600); }
+  .photo-btn span { font-size: 12px; color: var(--gray-600); font-weight: 500; }
+  .photo-btn small { font-size: 11px; color: var(--gray-200); }
+  .photo-btn.done { border-color: var(--green); background: var(--green-light); border-style: solid; }
+  .photo-btn.done svg { stroke: var(--green-dark); }
+  .photo-btn.done span { color: var(--green-dark); }
+  .photo-btn.error { border-color: var(--red); background: var(--red-light); }
+  .photo-btn.error svg { stroke: var(--red-dark); }
+  .photo-btn.error span { color: var(--red-dark); }
+  .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .check-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    user-select: none;
+  }
+  .check-item input { display: none; }
+  .check-box {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--gray-200);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .check-item.checked .check-box { background: var(--green); border-color: var(--green); }
+  .check-item.checked .check-box::after { content: '✓'; color: white; font-size: 11px; font-weight: 700; }
+  .check-item.checked { border-color: var(--green-border); background: var(--green-light); color: var(--green-dark); }
+  .check-item.unchecked { border-color: var(--red); background: var(--red-light); color: var(--red-dark); }
+  .check-item.unchecked .check-box { border-color: var(--red); }
+  .submit-btn {
+    width: 100%;
+    height: 52px;
+    background: var(--green);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .submit-btn:hover { background: var(--green-dark); }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { background: var(--gray-200); cursor: not-allowed; }
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 40px 20px;
+  }
+  .success-icon {
+    width: 72px; height: 72px;
+    background: var(--green-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    font-size: 32px;
+  }
+  .success-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: var(--green-dark); }
+  .success-sub { font-size: 14px; color: var(--gray-600); line-height: 1.6; }
+  .info-box {
+    background: var(--amber-light);
+    border: 1px solid var(--amber);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--amber-dark);
+    margin-top: 10px;
+    line-height: 1.5;
+  }
+  .field-hint { font-size: 11px; color: var(--gray-600); margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-dot"></div>
+  <div>
+    <div class="header-title">Total Clean</div>
+    <div class="header-sub">Início de jornada</div>
+  </div>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="container">
+  <div id="form-content">
+    <div class="date-badge">
+      📅 <span id="date-label"></span>
+    </div>
+
+    <!-- Identificação -->
+    <div class="card">
+      <div class="card-title">Identificação</div>
+      <div class="field">
+        <label>Motorista <span class="req">*</span></label>
+        <select id="motorista" onchange="updateProgress()">
+          <option value="">Selecionar...</option>
+          <option>Eduardo</option>
+          <option>Gustavo</option>
+          <option>Márcio</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Veículo <span class="req">*</span></label>
+        <select id="placa" onchange="updateProgress()">
+          <option value="">Selecionar...</option>
+          <option>PRISMA · MSR1361</option>
+          <option>CG 160 CARGO · TUG1B68</option>
+          <option>CG 160 CARGO · TUT1J12</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- KM inicial -->
+    <div class="card">
+      <div class="card-title">Quilometragem inicial</div>
+      <div class="field">
+        <label>KM atual <span class="req">*</span></label>
+        <input type="number" id="km-ini" placeholder="00000" oninput="updateProgress()">
+      </div>
+      <div class="field">
+        <label>Foto do hodômetro <span class="req">*</span></label>
+        <div class="photo-btn" id="pb-km" onclick="triggerFile('f-km')">
+          <input type="file" id="f-km" accept="image/*" capture="environment" onchange="markPhoto('pb-km', this, 'Hodômetro registrado')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <span>Tirar foto</span>
+          <small>Hodômetro da moto</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="card">
+      <div class="card-title">Checklist do veículo</div>
+      <p style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Marque os itens que estão <strong>ok</strong> no momento da saída.</p>
+      <div class="checklist-grid" id="checklist">
+        <div class="check-item checked" onclick="toggleCheck(this)">
+          <input type="checkbox" checked>
+          <div class="check-box"></div>
+          <span>Pneus ok</span>
+        </div>
+        <div class="check-item checked" onclick="toggleCheck(this)">
+          <input type="checkbox" checked>
+          <div class="check-box"></div>
+          <span>Lataria ok</span>
+        </div>
+        <div class="check-item checked" onclick="toggleCheck(this)">
+          <input type="checkbox" checked>
+          <div class="check-box"></div>
+          <span>Luzes ok</span>
+        </div>
+        <div class="check-item checked" onclick="toggleCheck(this)">
+          <input type="checkbox" checked>
+          <div class="check-box"></div>
+          <span>Nível de água ok</span>
+        </div>
+        <div class="check-item checked" onclick="toggleCheck(this)">
+          <input type="checkbox" checked>
+          <div class="check-box"></div>
+          <span>Óleo ok</span>
+        </div>
+        <div class="check-item checked" onclick="toggleCheck(this)">
+          <input type="checkbox" checked>
+          <div class="check-box"></div>
+          <span>Limpeza interna ok</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fotos da moto -->
+    <div class="card">
+      <div class="card-title">Fotos da moto</div>
+      <p style="font-size:13px;color:var(--gray-600);margin-bottom:12px;">Envie 3 ângulos obrigatórios antes de sair.</p>
+      <div class="photo-grid">
+        <div>
+          <div class="photo-btn" id="pb-frente" onclick="triggerFile('f-frente')">
+            <input type="file" id="f-frente" accept="image/*" capture="environment" onchange="markPhoto('pb-frente', this, 'Frente ok')">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Frente</span>
+          </div>
+        </div>
+        <div>
+          <div class="photo-btn" id="pb-lado" onclick="triggerFile('f-lado')">
+            <input type="file" id="f-lado" accept="image/*" capture="environment" onchange="markPhoto('pb-lado', this, 'Lateral ok')">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Lateral</span>
+          </div>
+        </div>
+        <div>
+          <div class="photo-btn" id="pb-tras" onclick="triggerFile('f-tras')">
+            <input type="file" id="f-tras" accept="image/*" capture="environment" onchange="markPhoto('pb-tras', this, 'Traseira ok')">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            <span>Traseira</span>
+          </div>
+        </div>
+      </div>
+      <div class="info-box">⚠️ Fotos são obrigatórias. Registre qualquer dano visível antes de sair — isso protege você.</div>
+    </div>
+
+    <button class="submit-btn" onclick="submitForm()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      Registrar início de jornada
+    </button>
+  </div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Jornada iniciada!</div>
+    <div class="success-sub" id="success-detail"></div>
+    <div style="margin-top:28px;padding:16px;background:var(--green-light);border-radius:var(--radius);font-size:13px;color:var(--green-dark);line-height:1.6;">
+      Lembre de preencher o <strong>encerramento de jornada</strong> ao final do dia.
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('date-label').textContent = new Date().toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+
+function triggerFile(id) { document.getElementById(id).click(); }
+
+function markPhoto(areaId, input, label) {
+  const area = document.getElementById(areaId);
+  if (input.files && input.files[0]) {
+    area.classList.add('done');
+    area.classList.remove('error');
+    area.querySelector('span').textContent = label || 'Foto ok';
+    area.querySelector('small') && (area.querySelector('small').textContent = '');
+    area.querySelector('svg').innerHTML = '<polyline points="20 6 9 17 4 12" stroke-width="2"/>';
+  }
+  updateProgress();
+}
+
+function toggleCheck(el) {
+  const cb = el.querySelector('input');
+  cb.checked = !cb.checked;
+  el.classList.remove('checked', 'unchecked');
+  el.classList.add(cb.checked ? 'checked' : 'unchecked');
+  updateProgress();
+}
+
+function updateProgress() {
+  let filled = 0, total = 6;
+  if (document.getElementById('motorista').value) filled++;
+  if (document.getElementById('placa').value) filled++;
+  if (document.getElementById('km-ini').value) filled++;
+  if (document.getElementById('pb-km').classList.contains('done')) filled++;
+  const photos = ['pb-frente','pb-lado','pb-tras'].filter(id => document.getElementById(id).classList.contains('done')).length;
+  filled += Math.round(photos / 3);
+  filled += 1; // checklist always counts
+  document.getElementById('progress').style.width = Math.round((filled / total) * 100) + '%';
+}
+
+function submitForm() {
+  const mot = document.getElementById('motorista').value;
+  const placa = document.getElementById('placa').value;
+  const km = document.getElementById('km-ini').value;
+
+  if (!mot) { alert('Selecione o motorista.'); return; }
+  if (!placa) { alert('Informe a placa do veículo.'); return; }
+  if (!km) { alert('Informe o KM inicial.'); return; }
+
+  const photoChecks = [
+    { id: 'pb-km', label: 'hodômetro' },
+    { id: 'pb-frente', label: 'frente da moto' },
+    { id: 'pb-lado', label: 'lateral da moto' },
+    { id: 'pb-tras', label: 'traseira da moto' },
+  ];
+  const missing = photoChecks.filter(p => !document.getElementById(p.id).classList.contains('done'));
+  if (missing.length) {
+    missing.forEach(p => document.getElementById(p.id).classList.add('error'));
+    alert('Fotos obrigatórias faltando:\n• ' + missing.map(p => p.label).join('\n• '));
+    return;
+  }
+
+  const unchecked = [...document.querySelectorAll('#checklist .check-item.unchecked')].map(el => el.querySelector('span').textContent);
+
+  document.getElementById('form-content').style.display = 'none';
+  document.getElementById('success-screen').style.display = 'block';
+  document.getElementById('progress').style.width = '100%';
+
+  let detail = `<strong>${mot}</strong> · Placa ${placa} · KM ${parseInt(km).toLocaleString('pt-BR')}`;
+  if (unchecked.length) detail += `<br><br>⚠️ Itens com atenção: ${unchecked.join(', ')}`;
+  document.getElementById('success-detail').innerHTML = detail;
+}
+</script>
+</body>
+</html>
